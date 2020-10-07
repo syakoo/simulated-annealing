@@ -80,7 +80,7 @@ class SimulatedAnnealing:
 
         return False
 
-    def exec(self, x_start: T) -> T:
+    def exec(self, x_start: T or None = None) -> T:
         """メインの実行
 
         Args:
@@ -91,12 +91,15 @@ class SimulatedAnnealing:
         """
         n = 0
         t = 0
-        x = x_start
+        x = x_start if not x_start is None else self._discrete_state_set[0]
 
-        while self._energy_function(t) >= self._energy_function(self._t_end):
-            for _ in range(n):
+        while self._cooling_schedule(t) >= self._cooling_schedule(self._t_end):
+            # print(f"_____________________")
+            # print(f"[t] {t}")
+            for _ in range(self._n_per):
                 x_next: T = self._generate_perturbation(x)
                 if self._is_acceptable(x, x_next, t):
+                    # print(f"[Accepted] x = {x_next}")
                     x = x_next
 
             t += 1
