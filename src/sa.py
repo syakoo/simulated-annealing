@@ -93,7 +93,7 @@ class SimulatedAnnealing:
         t = 0
         x = x_start if not x_start is None else self._discrete_state_set[0]
 
-        while self._cooling_schedule(t) >= self._cooling_schedule(self._t_end):
+        while self._cooling_schedule(t) >= self._t_end:
             # print(f"_____________________")
             # print(f"[t] {t}")
             for _ in range(self._n_per):

@@ -1,6 +1,7 @@
-from typing import Callable, List, Tuple
 from itertools import permutations
+import math
 import random as rd
+from typing import Callable, List, Tuple
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -9,38 +10,52 @@ from .sa import SimulatedAnnealing
 
 
 class TSP_SA(SimulatedAnnealing):
-    def __init__(self, cooling_schedule: Callable[[int], float], route: List[List[int]], n_per: int, t_end: float):
+    def __init__(self, cooling_schedule: Callable[[int], float], nodes: List[Tuple[int, int]], n_per: int, t_end: float):
         """TSP用のSA
 
         Args:
             cooling_schedule (Callable[[int], float]): クーリング関数
-            route (List[List[int]]): ルート
+            nodes (List[Tuple[int, int]]): ノードの集合
             n_per (int): nの最大値
             t_end (float): tの最大値 E(i)
         """
-        dis_set, e_func = TSP_SA.route2dataset(route)
-        self.routes = route
+        dis_set, e_func = TSP_SA.nodes2dataset(nodes)
+        self.nodes = nodes
         self.discrete_state_set = dis_set
         self.energy_function = e_func
         super().__init__(cooling_schedule, dis_set, e_func, n_per, t_end)
 
     @staticmethod
-    def route2dataset(route: List[List[int]]) -> Tuple[List[List[int]], Callable[[List[int]], float]]:
+    def seek_distance_nodes(node_a: Tuple[int, int], node_b: Tuple[int, int]) -> float:
+        """二つのノードの距離を求める関数
+
+        Args:
+            node_a (Tuple[int, int]): ノードA
+            node_b (Tuple[int, int]): ノードB
+
+        Returns:
+            float: 距離
+        """
+        return math.sqrt((node_a[0] - node_b[0]) ** 2 + (node_a[1] - node_b[1]) ** 2)
+
+    @staticmethod
+    def nodes2dataset(nodes: List[Tuple[int, int]]) -> Tuple[List[List[int]], Callable[[List[int]], float]]:
         """盤面情報から離散状態集合とエネルギー関数を出力する関数
 
         Args:
-            route (List[List[int]]): 盤面情報。正方行列
+            nodes (List[Tuple[int, int]]): 盤面情報。ノードの情報
 
         Returns:
             Tuple[List[List[int]], Callable[[List[int]], float]]: 離散状態集合とエネルギー関数
         """
-        range_list = list(range(len(route)))
+        range_list = list(range(len(nodes)))
         discrete_state_set = [list(l) for l in permutations(range_list)]
 
         def energy_function(x: List[int]) -> float:
-            result = 0
+            result = 0.0
             for i in range(len(x)):
-                result += route[x[i]][x[(i+1) % len(x)]]
+                result += TSP_SA.seek_distance_nodes(nodes[x[i]],
+                                                     nodes[x[(i+1) % len(x)]])
 
             return result
 
@@ -67,16 +82,15 @@ class TSP_SA(SimulatedAnnealing):
             x (List[int]): 離散状態
         """
         G = nx.Graph()
-        G.add_nodes_from(list(range(len(self._discrete_state_set[0]))))
-        edges = [(x[i], x[(i+1) % len(x)], self.routes[i][(i+1) % len(x)])
+        G.add_nodes_from(list(range(len(self.nodes))))
+        edges = [(x[i], x[(i+1) % len(x)], {})
                  for i in range(len(x))]
         G.add_weighted_edges_from(edges, weight="weight")
+        pos = dict([(xi, self.nodes[xi]) for xi in x])
 
         flg = plt.figure()
-        pos = nx.spring_layout(G)
-        nx.draw_networkx_nodes(G, pos, node_size=100)
-        nx.draw_networkx_edges(G, pos, width=1)
+        nx.draw_networkx(G, pos, node_color="#bbb")
 
         plt.axis("off")
-        # plt.show()
-        flg.savefig("img.png")
+        plt.show()
+        flg.savefig("./images/img.png")
