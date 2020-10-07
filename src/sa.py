@@ -100,3 +100,5 @@ class SimulatedAnnealing:
                     x = x_next
 
             t += 1
+        
+        return x
