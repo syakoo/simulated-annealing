@@ -75,7 +75,7 @@ class TSP_SA(SimulatedAnnealing):
         x[x1], x[x2] = x[x2], x[x1]
         return x
 
-    def draw_graph(self, x: List[int]):
+    def draw_graph(self, x: List[int], title: str = ""):
         """ルートを画像として出力する
 
         Args:
@@ -88,9 +88,14 @@ class TSP_SA(SimulatedAnnealing):
         G.add_weighted_edges_from(edges, weight="weight")
         pos = dict([(xi, self.nodes[xi]) for xi in x])
 
-        flg = plt.figure()
+        fig = plt.figure()
         nx.draw_networkx(G, pos, node_color="#bbb")
 
+        fig.suptitle(title)
         plt.axis("off")
         plt.show()
-        flg.savefig("./images/img.png")
+
+        if title == "":
+            fig.savefig("./images/img.png")
+        else:
+            fig.savefig(f"./images/{title}.png")
