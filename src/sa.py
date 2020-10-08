@@ -82,6 +82,14 @@ class SimulatedAnnealing:
 
         return False
 
+    def iter_log(self, x: T):
+        """毎イテレーションで呼び出されるログ用の関数。
+
+        Args:
+            x (T): 離散状態
+        """
+        pass
+
     def exec(self, x_start: T or None = None) -> T:
         """メインの実行
 
@@ -96,6 +104,7 @@ class SimulatedAnnealing:
         x = x_start if not x_start is None else self._discrete_state_set[0]
 
         while self._cooling_schedule(t) >= self._t_end:
+            self.iter_log(x)
             for _ in range(self._n_per):
                 x_next: T = self._generate_perturbation(x)
                 if self._is_acceptable(x, x_next, t):
