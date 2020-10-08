@@ -112,6 +112,6 @@ class SimulatedAnnealing:
                     x = x_next
 
             t += 1
-        logger.info(f"End exec(). x = {x}")
+        logger.info(f"End exec(). x = {x}, E(x) = {self._energy_function(x)}.")
 
         return x
