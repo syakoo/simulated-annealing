@@ -2,6 +2,8 @@ from typing import Callable, TypeVar, List
 import math
 import random as rd
 
+from .logger import logger
+
 T = TypeVar("T")
 
 
@@ -89,19 +91,18 @@ class SimulatedAnnealing:
         Returns:
             T: アルゴリズムによる解答
         """
-        n = 0
+        logger.info(f"Start exec(). x_start = {x_start}")
         t = 0
         x = x_start if not x_start is None else self._discrete_state_set[0]
 
         while self._cooling_schedule(t) >= self._t_end:
-            # print(f"_____________________")
-            # print(f"[t] {t}")
             for _ in range(self._n_per):
                 x_next: T = self._generate_perturbation(x)
                 if self._is_acceptable(x, x_next, t):
-                    # print(f"[Accepted] x = {x_next}")
+                    logger.debug(f"Accept a new state. new_x = {x_next}")
                     x = x_next
 
             t += 1
+        logger.info(f"End exec(). x = {x}")
 
         return x

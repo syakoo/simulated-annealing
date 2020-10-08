@@ -1,3 +1,7 @@
+# dir
 venv
 .vscode
 __pycache__
+
+# file
+*.log
