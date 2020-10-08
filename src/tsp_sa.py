@@ -93,7 +93,6 @@ class TSP_SA(SimulatedAnnealing):
 
         fig.suptitle(title)
         plt.axis("off")
-        plt.show()
 
         if title == "":
             fig.savefig("./images/img.png")
