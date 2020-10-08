@@ -7,6 +7,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from .sa import SimulatedAnnealing
+from .logger import logger
 
 
 class TSP_SA(SimulatedAnnealing):
@@ -23,6 +24,7 @@ class TSP_SA(SimulatedAnnealing):
         self.nodes = nodes
         self.discrete_state_set = dis_set
         self.energy_function = e_func
+        self._result_values = []
         super().__init__(cooling_schedule, dis_set, e_func, n_per, t_end)
 
     @staticmethod
@@ -49,7 +51,8 @@ class TSP_SA(SimulatedAnnealing):
             Tuple[List[List[int]], Callable[[List[int]], float]]: 離散状態集合とエネルギー関数
         """
         range_list = list(range(len(nodes)))
-        discrete_state_set = [list(l) for l in permutations(range_list)]
+        # discrete_state_set = [list(l) for l in permutations(range_list)]
+        discrete_state_set = [range_list] # プログラム内で使わないので一つだけ用意する
 
         def energy_function(x: List[int]) -> float:
             result = 0.0
@@ -101,4 +104,14 @@ class TSP_SA(SimulatedAnnealing):
             fig.savefig(f"./images/{title}.png")
 
     def iter_log(self, x: List[int], t: int):
-        self.draw_graph(x, title=f"iter_{t}")
+        logger.info(f"iter: t = {t}")
+        distance = self.energy_function(x)
+        self._result_values.append(distance)
+
+    def output_result_graph(self):
+        fig = plt.figure()
+        plt.plot(list(
+            range(len(self._result_values))), self._result_values, marker="o")
+        plt.xlabel("t")
+        plt.ylabel("distance")
+        fig.savefig("./images/graph.png")
