@@ -70,10 +70,11 @@ class TSP_SA(SimulatedAnnealing):
         Returns:
             List[int]: xに対する摂動
         """
-        x1, x2 = rd.sample(list(range(0, len(x))), 2)
+        x1, x2 = rd.sample(list(range(1, len(x))), 2)
+        result = x[:]
 
-        x[x1], x[x2] = x[x2], x[x1]
-        return x
+        result[x1], result[x2] = x[x2], x[x1]
+        return result
 
     def draw_graph(self, x: List[int], title: str = ""):
         """ルートを画像として出力する
@@ -98,3 +99,6 @@ class TSP_SA(SimulatedAnnealing):
             fig.savefig("./images/img.png")
         else:
             fig.savefig(f"./images/{title}.png")
+
+    def iter_log(self, x: List[int], t: int):
+        self.draw_graph(x, title=f"iter_{t}")
